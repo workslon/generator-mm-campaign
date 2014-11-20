@@ -1,13 +1,13 @@
 {
   "name": "generator-mm-campaign",
-  "version": "0.0.0",
-  "description": "Yeoman generator",
+  "version": "0.0.2",
+  "description": "Yeoman generator for Maxymiser campaigns - lets you quickly set up a project with sensible defaults and best practices based on default campaign structure.",
   "license": "MIT",
   "main": "app/index.js",
-  "repository": "workslon/generator-mm-campaign",
+  "repository": "https://github.com/workslon/generator-mm-campaign.git",
   "author": {
-    "name": "",
-    "email": "",
+    "name": "workslon",
+    "email": "workslon@gmail.com",
     "url": "https://github.com/workslon"
   },
   "engines": {

@@ -1,4 +1,4 @@
-module.exports = (grunt) ->
+ module.exports = (grunt) ->
   # campaign json structure
   cmpgn   = grunt.file.readJSON 'campaign.json'
 
@@ -78,6 +78,9 @@ module.exports = (grunt) ->
   pathsForConcat    = getPathsForConcat()
   pathsForClean     = getPathsForClean()
 
+  # load grunt tasks
+  require('load-grunt-tasks')(grunt);
+
   # grunt config
   grunt.initConfig
     srcDir: './src'
@@ -118,13 +121,24 @@ module.exports = (grunt) ->
       all:
         files: preprocPathsLess
 
+    # grunt coffee
+    coffee:
+      scripts:
+        expand: true
+        cwd: 'src/'
+        src: ['*.coffee']
+        dest: '<%= pubDir %>'
+        ext: '.js'
+        options:
+          bare: true
+
     # grunt copy
     copy:
       variants:
         files: preprocPathsJS
       scripts:
         expand: true
-        cwd: 'src/'
+        cwd: '<%= srcDir %>'
         src: ['*.js']
         dest: '<%= pubDir %>'
 
@@ -144,7 +158,11 @@ module.exports = (grunt) ->
       all:
         files: pathsForConcat
 
-    clean: pathsForClean
+    clean:
+      tmp:
+        src: pathsForClean
+      img:
+        src: ['<%= srcDir %>/img/*.*']
 
     imagemin:
       all:
@@ -168,24 +186,16 @@ module.exports = (grunt) ->
       less:
         files: '**/*.less'
         tasks: ['jade', 'less', 'copy', 'wrap', 'concat', 'clean']
+      coffee:
+        files: '<%= srcDir %>/*.coffee'
+        tasks: ['newer:coffee:scripts']
       js:
         files: '<%= srcDir %>/**/*.js'
         tasks: ['jade', 'less', 'copy', 'wrap', 'concat', 'clean']
       img:
         files: 'src/img/*.{png,jpg,gif}'
-        tasks: ['imagemin']
+        tasks: ['newer:imagemin:all']
 
-    grunt.loadNpmTasks 'grunt-contrib-jshint'
-    grunt.loadNpmTasks 'grunt-contrib-jade'
-    grunt.loadNpmTasks 'grunt-contrib-less'
-    grunt.loadNpmTasks 'grunt-contrib-copy'
-    grunt.loadNpmTasks 'grunt-contrib-concat'
-    grunt.loadNpmTasks 'grunt-contrib-watch'
-    grunt.loadNpmTasks 'grunt-contrib-clean'
-    grunt.loadNpmTasks 'grunt-contrib-imagemin'
-    grunt.loadNpmTasks 'grunt-remove-logging'
-    grunt.loadNpmTasks 'grunt-wrap'
+    grunt.registerTask('default', ['jshint', 'jade', 'less', 'coffee', 'copy', 'wrap', 'concat', 'imagemin', 'clean', 'watch']);
 
-    grunt.registerTask('default', ['jshint', 'jade', 'less', 'copy', 'wrap', 'concat', 'clean', 'imagemin', 'watch']);
-
-    grunt.registerTask('golive', ['jshint', 'jade', 'less', 'copy', 'wrap', 'concat', 'clean', 'removelogging']);
+    grunt.registerTask('golive', ['jshint', 'jade', 'less', 'coffee', 'copy', 'wrap', 'concat', 'imagemin', 'clean', 'removelogging']);
