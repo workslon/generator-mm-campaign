@@ -3,7 +3,6 @@ var util    = require('util'),
     path    = require('path'),
     yeoman  = require('yeoman-generator'),
     yosay   = require('yosay'),
-    fs      = require('fs'),
     parser  = require('../internal_modules/campaign-parser/')(yeoman);
 
 var MmCampaignGenerator = yeoman.generators.Base.extend({
@@ -59,22 +58,34 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
           }
         },
 
-        userPropsTmpl = ['campaignName', 'isJade', 'styletool', 'coffeeInVars', 'coffeeInScripts', 'scripts'],
-        userPrompts = [];
+        userPropsList = [
+          'campaignName',
+          'isJade',
+          'styletool',
+          'coffeeInVars',
+          'coffeeInScripts',
+          'scripts'
+        ],
+
+        userPrompts = [],
+
+        removePrompt = function (promptName) {
+          userPropsList.splice(userPropsList.indexOf(promptName), 1);
+        };
 
     this.campaign = parser(this.destinationRoot());
 
     if (!this.campaign.hasEmptyVars) {
-      userPropsTmpl.splice(userPropsTmpl.indexOf('isJade'), 1);
-      userPropsTmpl.splice(userPropsTmpl.indexOf('styletool'), 1);
-      userPropsTmpl.splice(userPropsTmpl.indexOf('coffeeInVars'), 1);
+      removePrompt('isJade');
+      removePrompt('styletool');
+      removePrompt('coffeeInVars');
     }
 
     if (!this.campaign.hasEmptyScripts) {
-      userPropsTmpl.splice(userPropsTmpl.indexOf('coffeeInScripts'), 1);
+      removePrompt('coffeeInScripts');
     }
 
-    userPropsTmpl.forEach(function (el) {
+    userPropsList.forEach(function (el) {
       userPrompts.push(prompts[el]);
     });
 
@@ -105,10 +116,14 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
     },
 
     projectfiles: function () {
-      // console.log(this.fs.copy);
-      console.log(this);
-      // this.fs.copy(this.templatePath('editorconfig'), '.editorconfig');
-      // this.fs.copy('jshintrc', '.jshintrc');
+      this.fs.copy(
+        this.templatePath('editorconfig'),
+        this.destinationPath('.editorconfig')
+      );
+      this.fs.copy(
+        this.templatePath('jshintrc'),
+        this.destinationPath('.jshintrc')
+      );
     }
   },
 
