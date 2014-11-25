@@ -6,8 +6,8 @@ module.exports = function (yeoman) {
         elements: {},
         scripts: []
       },
-      emptyVars = true,
-      emptyScripts = true;
+      hasEmptyVars = true,
+      hasEmptyScripts = true;
 
   /**
    * parse campaign and return tree object
@@ -42,9 +42,9 @@ module.exports = function (yeoman) {
 
     setNotEmpty = function (thing) {
       if (thing === 'variant') {
-        emptyVars = false;
+        hasEmptyVars = false;
       } else {
-        emptyScripts = false;
+        hasEmptyScripts = false;
       }
     },
 
@@ -67,6 +67,10 @@ module.exports = function (yeoman) {
       });
     })();
 
-    return tree;
+    return {
+      tree: tree,
+      hasEmptyVars: hasEmptyVars,
+      hasEmptyScripts: hasEmptyScripts
+    };
   };
 };
