@@ -8,7 +8,7 @@ var util    = require('util'),
 
 var MmCampaignGenerator = yeoman.generators.Base.extend({
   initializing: function () {
-    this.pkg = require('../package.json');
+    // this.pkg = require('../package.json');
   },
 
   prompting: function () {
@@ -112,7 +112,6 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
         };
 
     this.campaign = parse(this.destinationRoot());
-
     configUserPrompts(this.campaign);
 
     this.log(yosay(
@@ -131,22 +130,24 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
       // 1. create app structure
       build(this.campaign.tree, this.userConfig, this.destinationRoot());
 
+      // 2. load and cofig package.json
+      this.pkg = this.fs.readJSON(this.templatePath('_package.json'));
+      this.pkg.name = this.userConfig.campaignName;
+      this.pkg = JSON.stringify(this.pkg);
+      this.fs.write(this.destinationPath('package.json'), this.pkg);
 
-
-
-      // 2. create package.json
       // 3. create Gruntfile
     },
 
     projectfiles: function () {
-      // this.fs.copy(
-      //   this.templatePath('editorconfig'),
-      //   this.destinationPath('.editorconfig')
-      // );
-      // this.fs.copy(
-      //   this.templatePath('jshintrc'),
-      //   this.destinationPath('.jshintrc')
-      // );
+      this.fs.copy(
+        this.templatePath('editorconfig'),
+        this.destinationPath('.editorconfig')
+      );
+      this.fs.copy(
+        this.templatePath('jshintrc'),
+        this.destinationPath('.jshintrc')
+      );
     }
   },
 

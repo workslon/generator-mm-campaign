@@ -28,6 +28,7 @@
     "yosay": "^0.3.0"
   },
   "devDependencies": {
+    "coffee-script": "^1.8.0",
     "mocha": "*"
   },
   "peerDependencies": {

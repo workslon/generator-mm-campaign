@@ -20,10 +20,8 @@ module.exports = function (yeoman) {
     return function (tree, config, dest) {
       name      = config.campaignName;
       prefix    = (name.match(/[A-Za-z]\d+\_?/) || [undefined, 'TXX'])[0];
-
       elements  = tree.elements,
       scripts   = tree.scripts,
-
       srcDir    = path.join(dest, 'src');
       pubDir    = path.join(dest, 'public');
 
@@ -86,8 +84,6 @@ module.exports = function (yeoman) {
 
         // create variants
         elements[element].forEach(function (el) {
-
-
           variant = path.join(elementDir, el.name);
           fs.write(variant, el.content);
         });
