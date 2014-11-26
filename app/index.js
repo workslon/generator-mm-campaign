@@ -3,7 +3,8 @@ var util    = require('util'),
     path    = require('path'),
     yeoman  = require('yeoman-generator'),
     yosay   = require('yosay'),
-    parser  = require('../internal_modules/campaign-parser/')(yeoman);
+    parser  = require('../internal_modules/parse-tree/')(yeoman),
+    build   = require('../internal_modules/build-tree/')(yeoman),
 
 var MmCampaignGenerator = yeoman.generators.Base.extend({
   initializing: function () {
@@ -21,88 +22,99 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
             default: 'camapign'
           },
 
-          isJade: {
-            type: 'confirm',
-            name: 'isJade',
-            message: 'Would you like to use jade instead of html in variants?',
-            default: false
-          },
-
-          styletool: {
+          markup: {
             type: 'list',
-            name: 'styletool',
-            message: 'What stylesheet language would you prefer to use?',
-            choices: ['CSS', 'Less', 'Saas'],
+            name: 'markup',
+            message: 'Which markup language would you like to use?',
+            choices: ['HTML', 'Jade'],
             default: 0
           },
 
-          coffeeInVars: {
-            type: 'confirm',
-            name: 'coffeeInVars',
-            message: 'Would you like to use coffeescript in variants?',
-            default: false
+          style: {
+            type: 'list',
+            name: 'style',
+            message: 'Which stylesheet language would you prefer to use?',
+            choices: ['CSS', 'Less'],
+            default: 0
           },
 
-          coffeeInScripts: {
-            type: 'confirm',
-            name: 'coffeeInScripts',
-            message: 'Would you like to use coffeescript for campaign scripts?',
-            default: false
+          scriptInVars: {
+            type: 'list',
+            name: 'scriptInVars',
+            message: 'Which scripting language would you like to use in variants?',
+            choices: ['JS', 'Coffee'],
+            default: 0
           },
 
-          scripts: {
+          scriptInScripts: {
+            type: 'list',
+            name: 'scriptInScripts',
+            message: 'Which scripting language would you like to use for campaign scripts?',
+            choices: ['JS', 'Coffee'],
+            default: 0
+          },
+
+          helpers: {
             type: 'checkbox',
-            name: 'scripts',
+            name: 'helpers',
             message: 'Please select the scripts you will need for your campaign',
-            choices: ['render', 'checker', 'actions', 'micro templater', 'utils']
+            choices: ['Render', 'checker', 'actions', 'templater', 'utils']
           }
         },
 
-        userPropsList = [
+        promptSequence = [
           'campaignName',
-          'isJade',
-          'styletool',
-          'coffeeInVars',
-          'coffeeInScripts',
-          'scripts'
+          'markup',
+          'style',
+          'scriptInVars',
+          'scriptInScripts',
+          'helpers'
         ],
 
         userPrompts = [],
 
         removePrompt = function (promptName) {
-          userPropsList.splice(userPropsList.indexOf(promptName), 1);
+          promptSequence.splice(promptSequence.indexOf(promptName), 1);
+        },
+
+        configUserPrompts = function (campaign) {
+          if (!campaign.hasEmptyVars) {
+            removePrompt('markup');
+            removePrompt('style');
+            removePrompt('coffeeInVars');
+          }
+
+          if (!campaign.hasEmptyScripts) {
+            removePrompt('coffeeInScripts');
+          }
+
+          promptSequence.forEach(function (el) {
+            userPrompts.push(prompts[el]);
+          });
+        },
+
+        getUserConfig = function (props) {
+          var prop, config = {};
+
+          for (prop in props) {
+            config[prop] = props[prop];
+          }
+
+          return config;
         };
 
     this.campaign = parser(this.destinationRoot());
 
-    if (!this.campaign.hasEmptyVars) {
-      removePrompt('isJade');
-      removePrompt('styletool');
-      removePrompt('coffeeInVars');
-    }
+    console.log(this.campaign);
 
-    if (!this.campaign.hasEmptyScripts) {
-      removePrompt('coffeeInScripts');
-    }
-
-    userPropsList.forEach(function (el) {
-      userPrompts.push(prompts[el]);
-    });
+    configUserPrompts(this.campaign);
 
     this.log(yosay(
       'Welcome to the Maxymiser campaign generator!'
     ));
 
     this.prompt(userPrompts, function (props) {
-      this.userConfig = {
-        name: props.campaignName,
-        isJade: props.isJade,
-        styletool: props.styletool,
-        coffeeInVars: props.coffeeInVars,
-        coffeeInScripts: props.coffeeInScripts,
-        scripts: props.scripts
-      };
-
+      this.userConfig = getUserConfig(props);
       done();
     }.bind(this), {store: true});
   },
@@ -111,6 +123,11 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
     app: function () {
 
       // 1. create app structure
+
+
+
+
+
       // 2. create package.json
       // 3. create Gruntfile
     },

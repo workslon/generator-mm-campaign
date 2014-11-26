@@ -28,8 +28,12 @@ module.exports = function (yeoman) {
       });
     },
 
-    addScript = function (filename) {
-      tree.scripts.push(filename);
+    addScript = function (filename, content) {
+      content = content || ('/* ' + filename + ' */\n');
+      tree.scripts.push({
+        name: filename,
+        content: content
+      });
     },
 
     isEmpty = function (thing, content) {
@@ -52,14 +56,17 @@ module.exports = function (yeoman) {
       var content;
 
       file.recurse(root, function (abspath, rootdir, subdir, filename) {
+        content = file.read(abspath);
+
         if (subdir) {
-          content = file.read(abspath);
           addVariant(abspath, subdir, filename, content);
+
           if (!isEmpty('variant', content)) {
             setNotEmpty('variant');
           }
         } else {
-          addScript(filename);
+          addScript(filename, content);
+
           if (!isEmpty('script', content)) {
             setNotEmpty('script');
           }
