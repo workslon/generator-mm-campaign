@@ -9,21 +9,26 @@ module.exports = function (yeoman) {
         srcDir,     pubDir,
         elementDir, variantDir,
         element,    variant,
-        extensions;
+        extensions,
 
         normalizeExt = function (ext) {
-          return '.' + ext.toLowerCase();
+          if (ext) {
+            return '.' + ext.toLowerCase();
+          }
         };
 
     return function (tree, config, dest) {
-      name        = config.campaignName;
-      prefix      = (name.match(/[A-Za-z]\d+\_?/) || [undefined, 'TXX'])[1];
 
-      elements    = tree.elements,
-      scripts     = tree.scripts,
+      console.log('name::', config.campaignName)
 
-      srcDir      = path.join(dest, 'src');
-      pubDir      = path.join(dest, 'public');
+      name      = config.campaignName;
+      prefix    = (name.match(/[A-Za-z]\d+\_?/) || [undefined, 'TXX'])[0];
+
+      elements  = tree.elements,
+      scripts   = tree.scripts,
+
+      srcDir    = path.join(dest, 'src');
+      pubDir    = path.join(dest, 'public');
 
       extensions  = {
         markup: normalizeExt(config.markup),
@@ -43,8 +48,8 @@ module.exports = function (yeoman) {
         fs.mkdir(elementDir);
 
         elements[element].forEach(function (el) {
-          variantDir  = path.join(srcDir, element, path.basename(el.name));
-          variant     = path.join(variantDir, path.basename(el.name));
+          variantDir  = path.join(srcDir, element, path.basename(el.name, '.html'));
+          variant     = path.join(variantDir, path.basename(el.name, '.html'));
 
           // create variant directory
           fs.mkdir(variantDir);
@@ -69,7 +74,7 @@ module.exports = function (yeoman) {
         helper += extensions.helper;
         helper = path.join(srcDir, helper);
 
-        if (!file.exists(helper)) {
+        if (!fs.exists(helper)) {
           fs.write(helper, helper.content);
         }
       });
