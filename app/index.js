@@ -3,8 +3,8 @@ var util    = require('util'),
     path    = require('path'),
     yeoman  = require('yeoman-generator'),
     yosay   = require('yosay'),
-    parser  = require('../internal_modules/parse-tree/')(yeoman),
-    build   = require('../internal_modules/build-tree/')(yeoman),
+    parse   = require('../internal_modules/parse-tree/')(yeoman),
+    build   = require('../internal_modules/build-tree/')(yeoman);
 
 var MmCampaignGenerator = yeoman.generators.Base.extend({
   initializing: function () {
@@ -58,7 +58,7 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
             type: 'checkbox',
             name: 'helpers',
             message: 'Please select the scripts you will need for your campaign',
-            choices: ['Render', 'checker', 'actions', 'templater', 'utils']
+            choices: ['Render', 'Checker', 'Actions', 'Templater', 'Utils']
           }
         },
 
@@ -81,11 +81,11 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
           if (!campaign.hasEmptyVars) {
             removePrompt('markup');
             removePrompt('style');
-            removePrompt('coffeeInVars');
+            removePrompt('scriptInVars');
           }
 
           if (!campaign.hasEmptyScripts) {
-            removePrompt('coffeeInScripts');
+            removePrompt('scriptInScripts');
           }
 
           promptSequence.forEach(function (el) {
@@ -94,7 +94,15 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
         },
 
         getUserConfig = function (props) {
-          var prop, config = {};
+          var config = {
+            campaignName: 'campaign',
+            markup: 'html',
+            style: 'css',
+            scriptInVars: 'js',
+            scriptInScripts: 'js',
+            helpers: []
+          },
+          prop;
 
           for (prop in props) {
             config[prop] = props[prop];
@@ -103,9 +111,7 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
           return config;
         };
 
-    this.campaign = parser(this.destinationRoot());
-
-    console.log(this.campaign);
+    this.campaign = parse(this.destinationRoot());
 
     configUserPrompts(this.campaign);
 
@@ -123,7 +129,7 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
     app: function () {
 
       // 1. create app structure
-
+      build(this.campaign.tree, this.userConfig, this.destinationRoot());
 
 
 
@@ -133,14 +139,14 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
     },
 
     projectfiles: function () {
-      this.fs.copy(
-        this.templatePath('editorconfig'),
-        this.destinationPath('.editorconfig')
-      );
-      this.fs.copy(
-        this.templatePath('jshintrc'),
-        this.destinationPath('.jshintrc')
-      );
+      // this.fs.copy(
+      //   this.templatePath('editorconfig'),
+      //   this.destinationPath('.editorconfig')
+      // );
+      // this.fs.copy(
+      //   this.templatePath('jshintrc'),
+      //   this.destinationPath('.jshintrc')
+      // );
     }
   },
 

@@ -18,9 +18,6 @@ module.exports = function (yeoman) {
         };
 
     return function (tree, config, dest) {
-
-      console.log('name::', config.campaignName)
-
       name      = config.campaignName;
       prefix    = (name.match(/[A-Za-z]\d+\_?/) || [undefined, 'TXX'])[0];
 
@@ -37,7 +34,7 @@ module.exports = function (yeoman) {
         helper: normalizeExt(config.scriptInScripts),
       };
 
-      // create `src` folder structure
+      //--- create `src` folder structure
       fs.mkdir(srcDir);
 
       // elements
@@ -74,9 +71,38 @@ module.exports = function (yeoman) {
         helper += extensions.helper;
         helper = path.join(srcDir, helper);
 
-        if (!fs.exists(helper)) {
+        if (!fs.exists(path.join(srcDir, helper))) {
           fs.write(helper, helper.content);
         }
+      });
+
+      //--- create `public` folder structure
+      fs.mkdir(pubDir);
+
+      // elements
+      for (element in elements) {
+        elementDir = path.join(pubDir, element);
+        fs.mkdir(elementDir);
+
+        // create variants
+        elements[element].forEach(function (el) {
+
+
+          variant = path.join(elementDir, el.name);
+          fs.write(variant, el.content);
+        });
+
+        fs.delete(element);
+      }
+
+      // scripts
+      scripts.forEach(function (script) {
+        script = path.join(pubDir, script.name);
+        fs.write(script, script.content);
+      });
+
+      scripts.forEach(function (script) {
+        fs.delete(script.name);
       });
     }
 };

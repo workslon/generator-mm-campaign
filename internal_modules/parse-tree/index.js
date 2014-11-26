@@ -40,7 +40,7 @@ module.exports = function (yeoman) {
       if (thing === 'variant') {
         return !/.+/im.test(content);
       } else {
-        return /\/\*\*\//im.test(content);
+        return /\/\*\*\//im.test(content) || !/.+/im.test(content);
       }
     },
 
