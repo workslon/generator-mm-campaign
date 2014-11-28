@@ -127,16 +127,26 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
   writing: {
     app: function () {
 
-      // 1. create app structure
+      // 1. create campaign structure
       build(this.campaign.tree, this.userConfig, this.destinationRoot());
 
-      // 2. load and cofig package.json
+      // 2. load and config package.json
       this.pkg = this.fs.readJSON(this.templatePath('_package.json'));
       this.pkg.name = this.userConfig.campaignName;
       this.pkg = JSON.stringify(this.pkg);
       this.fs.write(this.destinationPath('package.json'), this.pkg);
 
-      // 3. create Gruntfile
+      // 3. create campaign.json
+      this.fs.write(
+        this.destinationPath('campaign.json'),
+        JSON.stringify(this.campaign.tree)
+      );
+
+      // 4. create Gruntfile
+      this.fs.copy(
+        this.templatePath('_gruntfile.coffee'),
+        this.destinationPath('Gruntfile.coffee')
+      );
     },
 
     projectfiles: function () {
@@ -152,6 +162,10 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
   },
 
   end: function () {
+    this.npmInstall([], function () {
+      this.spawnCommand('grunt');
+    });
+    // console.log(this.runInstall.toString());
     // this.installDependencies({
     //   callback: (function () {
     //     this.spawnCommand('grunt').on('close', (function () {
