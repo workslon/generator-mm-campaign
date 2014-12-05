@@ -1,4 +1,4 @@
- module.exports = (grunt) ->
+module.exports = (grunt) ->
   path = require 'path'
 
   # campaign json structure
@@ -73,12 +73,14 @@
   preprocPathsLess    = getPreprocPaths('.less','.css')
   preprocPathsCoffee  = getPreprocPaths('.coffee','.js')
   preprocPathsJS      = getPreprocPaths('.js','.js')
+  preprocPathsCSS     = getPreprocPaths('.css','.css')
+  preprocPathsHTML    = getPreprocPaths('.html','.html')
   pathsForWrapCSS     = getPathsForWrap('.css')
   pathsForWrapJS      = getPathsForWrap('.js')
   pathsForConcat      = getPathsForConcat()
   pathsForClean       = getPathsForClean()
 
-  # load grunt tasks
+  # grunt load grunt tasks
   require('load-grunt-tasks')(grunt);
 
   # grunt config
@@ -111,6 +113,21 @@
       all:
         src: 'src/**/*.js'
 
+    # grunt clean
+    clean:
+      img:
+        src: ['<%= srcDir %>/img/*.*']
+
+    # grunt imagemin
+    imagemin:
+      all:
+        files: [
+          expand: true
+          cwd: 'src/img/'
+          src: ['**/*.{png,jpg,gif}']
+          dest: '<%= pubDir %>/img/'
+        ]
+
     # grunt jade
     jade:
       all:
@@ -125,25 +142,41 @@
     coffee:
       variants:
         files: preprocPathsCoffee
+        options:
+          bare: true
       scripts:
         expand: true
         cwd: 'src/'
         src: ['*.coffee']
         dest: '<%= pubDir %>'
         ext: '.js'
-        options:
-          bare: true
-
 
     # grunt copy
     copy:
-      variants:
+      html:
+        files: preprocPathsHTML
+      css:
+        files: preprocPathsCSS
+      jsvars:
         files: preprocPathsJS
-      scripts:
+      jsscripts:
         expand: true
-        cwd: '<%= srcDir %>'
+        cwd: 'src/'
         src: ['*.js']
         dest: '<%= pubDir %>'
+        ext: '.js'
+
+    # grunt coffeelint
+    coffeelint:
+      all:
+        files:
+          src: [
+            '<%= srcDir %>/*.coffee'
+            '<%= srcDir %>/**/*.coffee'
+          ]
+        options:
+          no_backticks:
+            level: 'ignore'
 
     # grunt wrap
     wrap:
@@ -161,44 +194,52 @@
       all:
         files: pathsForConcat
 
-    clean:
-      tmp:
-        src: pathsForClean
-      img:
-        src: ['<%= srcDir %>/img/*.*']
-
-    # imagemin:
-    #   all:
-    #     files: [
-    #       expand: true,
-    #       cwd: 'src/img/',
-    #       src: ['**/*.{png,jpg,gif}'],
-    #       dest: '<%= pubDir %>/img/'
-    #     ]
-
-    # grunt remove logging
-    removelogging:
-      dist:
-        src: ['<%= pubDir %>/**/*.*']
-
     # grunt watch
-    # watch:
-    #   jade:
-    #     files: '**/*.jade'
-    #     tasks: ['jade', 'less', 'coffee', 'copy', 'wrap', 'concat']
-    #   less:
-    #     files: '**/*.less'
-    #     tasks: ['jade', 'less', 'copy', 'wrap', 'concat']
-    #   coffee:
-    #     files: '<%= srcDir %>/*.coffee'
-    #     tasks: ['newer:coffee:scripts']
-    #   js:
-    #     files: '<%= srcDir %>/**/*.js'
-    #     tasks: ['jshint', 'jade', 'less', 'copy', 'wrap', 'concat', 'clean']
-    #   img:
-    #     files: 'src/img/*.{png,jpg,gif}'
-    #     tasks: ['newer:imagemin:all']
+    watch:
+      img:
+        files: 'src/img/*.{png,jpg,gif}'
+        tasks: ['newer:imagemin:all', 'clean']
+      jade:
+        files: '**/*.jade'
+        tasks: ['newer:jade', 'newer:concat']
+      less:
+        files: '**/*.less'
+        tasks: ['newer:less', 'newer:wrap:css', 'newer:concat']
+      coffeeVars:
+        files: '<%= srcDir %>/**/*.coffee'
+        tasks: [
+          'newer:coffee:variants'
+          'newer:coffeelint'
+          'newer:wrap:js'
+          'newer:concat'
+        ]
+      coffeeScripts:
+        files: '<%= srcDir %>/*.coffee'
+        tasks: ['newer:coffee:scripts', 'newer:coffeelint']
+      copyJsScripts:
+        files: '*.js'
+        tasks: 'newer:copy:jsscripts'
+      copyJsVars:
+        files: '<%= srcDir %>/*/*/*.js'
+        tasks: [
+          'newer:copy:jsvars'
+          'newer:jshint'
+          'newer:wrap:js'
+          'newer:concat'
+        ]
+      copyHtml:
+        files: '<%= srcDir %>/*/*/*.html'
+        tasks: [
+          'newer:copy:html'
+          'newer:concat'
+        ]
+      copyCss:
+        files: '<%= srcDir %>/*/*/*.css'
+        tasks: [
+          'newer:copy:css'
+          'newer:wrap:css'
+          'newer:concat'
+        ]
 
-    grunt.registerTask('default', ['jshint', 'jade', 'less', 'coffee', 'copy', 'wrap', 'concat']);
-
-    grunt.registerTask('golive', ['jshint', 'jade', 'less', 'coffee', 'copy', 'wrap', 'concat', 'imagemin', 'clean', 'removelogging']);
+    #slon
+    #grunttask
