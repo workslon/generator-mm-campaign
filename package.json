@@ -1,6 +1,6 @@
 {
   "name": "generator-mm-campaign",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Yeoman generator for Maxymiser campaigns - lets you quickly set up a project with sensible defaults and best practices based on default campaign structure.",
   "license": "MIT",
   "main": "app/index.js",
