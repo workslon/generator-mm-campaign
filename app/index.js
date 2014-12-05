@@ -26,7 +26,7 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
             type: 'list',
             name: 'markup',
             message: 'Which markup language would you like to use?',
-            choices: ['HTML', 'Jade'],
+            choices: ['html', 'jade'],
             default: 0
           },
 
@@ -34,7 +34,7 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
             type: 'list',
             name: 'style',
             message: 'Which stylesheet language would you prefer to use?',
-            choices: ['CSS', 'Less'],
+            choices: ['css', 'less'],
             default: 0
           },
 
@@ -42,7 +42,7 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
             type: 'list',
             name: 'scriptInVars',
             message: 'Which scripting language would you like to use in variants?',
-            choices: ['JS', 'Coffee'],
+            choices: ['js', 'coffee'],
             default: 0
           },
 
@@ -50,7 +50,7 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
             type: 'list',
             name: 'scriptInScripts',
             message: 'Which scripting language would you like to use for campaign scripts?',
-            choices: ['JS', 'Coffee'],
+            choices: ['js', 'coffee'],
             default: 0
           },
 
@@ -150,7 +150,6 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
         this.gruntfilePath
       );
 
-      // config gruntfile
       this.gruntFile = this.fs.read(this.gruntfilePath);
       this.gruntFile = this.gruntFile.split('\n').map(function (el) {
         if (/\s*\#grunttask/.test(el)) {

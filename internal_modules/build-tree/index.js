@@ -32,8 +32,12 @@ module.exports = function (yeoman) {
         helper: normalizeExt(config.scriptInScripts),
       };
 
+
       //--- create `src` folder structure
       fs.mkdir(srcDir);
+
+      // create `img` folder
+      fs.mkdir(path.join(srcDir, 'img'));
 
       // elements
       for (element in elements) {

@@ -111,7 +111,7 @@ module.exports = (grunt) ->
           mm_inner_HTML: true
         }
       all:
-        src: 'src/**/*.js'
+        src: ['src/*.js', 'src/*/*/*.js']
 
     # grunt clean
     clean:
@@ -217,7 +217,7 @@ module.exports = (grunt) ->
         files: '<%= srcDir %>/*.coffee'
         tasks: ['newer:coffee:scripts', 'newer:coffeelint']
       copyJsScripts:
-        files: '*.js'
+        files: 'src/*.js'
         tasks: 'newer:copy:jsscripts'
       copyJsVars:
         files: '<%= srcDir %>/*/*/*.js'
@@ -241,5 +241,15 @@ module.exports = (grunt) ->
           'newer:concat'
         ]
 
-    #slon
-    #grunttask
+    # register default task
+    grunt.registerTask 'default', [
+      'copy'
+      'jade'
+      'less'
+      'coffee'
+      'wrap'
+      'concat'
+      'imagemin'
+      'clean'
+      'watch'
+    ]
