@@ -1,10 +1,11 @@
 'use strict';
-var util    = require('util'),
+var ncp     = require('ncp').ncp,
+    util    = require('util'),
     path    = require('path'),
     yeoman  = require('yeoman-generator'),
     yosay   = require('yosay'),
-    parse   = require('../internal_modules/parse-tree/')(yeoman), // replace with new native this.fs
-    build   = require('../internal_modules/build-tree/')(yeoman); // replace with new native this.fs
+    parse   = require('../internal_modules/parse-tree/')(yeoman),
+    build   = require('../internal_modules/build-tree/')(yeoman);
 
 var MmCampaignGenerator = yeoman.generators.Base.extend({
   initializing: function () {
@@ -130,37 +131,14 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
       build(this.campaign.tree, this.userConfig, this.destinationRoot());
 
       // load and config package.json
-      this.defPkgPath   = this.templatePath('_package.json')
-      this.pkgPath      = this.destinationPath('package.json')
+      this.defPkgPath   = this.templatePath('_package.json');
+      this.pkgPath      = this.destinationPath('package.json');
       this.pkg          = this.fs.readJSON(this.defPkgPath);
       this.pkg.name     = this.userConfig.campaignName;
       this.pkg          = JSON.stringify(this.pkg);
       this.fs.write(this.pkgPath, this.pkg);
 
-      // create campaign.json
-      this.fs.write(
-        this.destinationPath('campaign.json'),
-        JSON.stringify(this.campaign.tree)
-      );
-
-      // create Gruntfile
-      this.gruntfilePath = this.destinationPath('Gruntfile.coffee');
-      this.fs.copy(
-        this.templatePath('_gruntfile.coffee'),
-        this.gruntfilePath
-      );
-
-      this.gruntFile = this.fs.read(this.gruntfilePath);
-      this.gruntFile = this.gruntFile.split('\n').map(function (el) {
-        if (/\s*\#grunttask/.test(el)) {
-          el = el.replace(/#grunttask/, "grunt.registerTask 'default', ['watch']")
-        }
-        return el;
-      })
-      this.fs.write(this.gruntfilePath, this.gruntFile.join('\n'));
-    },
-
-    projectfiles: function () {
+      // add some configuration files
       this.fs.copy(
         this.templatePath('editorconfig'),
         this.destinationPath('.editorconfig')
@@ -169,6 +147,34 @@ var MmCampaignGenerator = yeoman.generators.Base.extend({
         this.templatePath('jshintrc'),
         this.destinationPath('.jshintrc')
       );
+
+      // add campaign.json
+      this.fs.write(
+        this.destinationPath('campaign.json'),
+        JSON.stringify(this.campaign.tree)
+      );
+
+      // add Gruntfile
+      this.gruntfilePath = this.destinationPath('Gruntfile.coffee');
+      this.fs.copy(
+        this.templatePath('_gruntfile.coffee'),
+        this.gruntfilePath
+      );
+
+      // add grunt tasks folder
+      ncp(this.templatePath('_grunt/'), this.destinationPath(), function (err) {
+        if (err) {
+          console.log('NCP module ERROR:', err);
+        }
+      });
+
+      // add `paths` module
+      ncp(this.templatePath('_paths'), this.destinationPath('node_modules'),
+        function (err) {
+          if (err) {
+            console.log('NCP module ERROR:', err);
+          }
+      });
     }
   },
 

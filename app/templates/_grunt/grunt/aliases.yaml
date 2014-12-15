@@ -1,0 +1,13 @@
+default:
+  description: 'Default (production) build'
+  tasks:
+    - copy
+    - jade
+    - less
+    - coffee
+    - wrap
+    - concat
+    - imagemin
+    - clean
+    - watch
+

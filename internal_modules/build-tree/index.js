@@ -32,7 +32,6 @@ module.exports = function (yeoman) {
         helper: normalizeExt(config.scriptInScripts),
       };
 
-
       //--- create `src` folder structure
       fs.mkdir(srcDir);
 
@@ -53,11 +52,15 @@ module.exports = function (yeoman) {
           // create variant directory
           fs.mkdir(variantDir);
 
-          // create variant
-          [extensions.markup, extensions.style, extensions.script]
+          // create variant's markup and scriptiong files
+          [extensions.markup, extensions.script]
             .forEach(function (ext) {
-              fs.write(variant + ext, el.content);
+              fs.write(variant + ext);
             });
+
+          // create styles dir with manifest file
+          fs.mkdir(variant + extensions.style);
+          fs.write(path.join(variant + extensions.style, 'main' + extensions.style));
         });
       }
 
