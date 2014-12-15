@@ -19,38 +19,37 @@ module.exports = (grunt) ->
 
     paths.join(',').split(',')
 
-  getPreprocPaths = (src_ext, dest_ext) ->
+  getPreprocPaths = (src_ext, dest_name) ->
     dirs  = getVarPaths()
 
     paths = for dir in dirs
       name  = dir.replace(/.*\//, '')
       src   = path.join(dir, (name + src_ext))
-      dest  = path.join(dir, tmp, (name + dest_ext))
+      dest  = path.join(dir, tmp, dest_name + '.html')
 
       src: src
       dest: dest
 
     paths
 
-  getStylePaths = (src_ext, dest_ext) ->
+  getStylePaths = (src_ext, dest_name) ->
     dirs  = getVarPaths()
 
     paths = for dir in dirs
       name  = dir.replace(/.*\//, '')
-      src   = path.join(dir, (name + src_ext), 'main' + src_ext)
-      dest  = path.join(dir, tmp, (name + dest_ext))
+      src   = path.join(dir, (name + src_ext), ('main' + src_ext))
+      dest  = path.join(dir, tmp, dest_name + '.html')
 
       src: src
       dest: dest
 
     paths
 
-  getPathsForWrap = (ext) ->
+  getPathsForWrap = (name) ->
     dirs  = getVarPaths()
 
     paths = for dir in dirs
-      name  = path.basename(dir) + ext
-      src   = path.join(dir, tmp, name)
+      src   = path.join(dir, tmp, name + '.html')
       dest  = path.join(src)
 
       src: src
@@ -63,10 +62,10 @@ module.exports = (grunt) ->
 
     paths = for dir in dirs
       name  = path.basename(dir)
-      base  = path.join(dir, tmp, name)
-      css   = base + '.css'
-      html  = base + '.html'
-      js    = base + '.js'
+      base  = path.join(dir, tmp)
+      css   = path.join(base, 'css.html')
+      html  = path.join(base, 'html.html')
+      js    = path.join(base, 'js.html')
       src   = [css, html, js]
       dest  = pubDir + dir.match(/\/.+?\//)[0] + name + '.html'
 
@@ -83,14 +82,14 @@ module.exports = (grunt) ->
 
     paths
 
-  jade      = getPreprocPaths('.jade','.html')
-  less      = getStylePaths('.less','.css')
-  coffee    = getPreprocPaths('.coffee','.js')
-  js        = getPreprocPaths('.js','.js')
-  css       = getStylePaths('.css','.css')
-  html      = getPreprocPaths('.html','.html')
-  wrapCSS   = getPathsForWrap('.css')
-  wrapJS    = getPathsForWrap('.js')
+  jade      = getPreprocPaths('.jade','html')
+  less      = getStylePaths('.less','css')
+  coffee    = getPreprocPaths('.coffee','js')
+  js        = getPreprocPaths('.js','js')
+  css       = getStylePaths('.css','css')
+  html      = getPreprocPaths('.html','html')
+  wrapCSS   = getPathsForWrap('css')
+  wrapJS    = getPathsForWrap('js')
   concat    = getPathsForConcat()
 
   return {jade, less, coffee, js, css, html, wrapCSS, wrapJS, concat}
